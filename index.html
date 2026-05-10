@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>婚活運勢占い</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    min-height:100vh;
+    background: linear-gradient(160deg, #1a0010 0%, #2d0028 40%, #1a0018 100%);
+    font-family:'Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
+    color:#f0d0e8;
+    display:flex; flex-direction:column; align-items:center;
+    padding:40px 16px 60px;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes glow { 0%,100%{opacity:.5} 50%{opacity:1} }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+  .fade { animation:fadeUp .6s ease both; }
+
+/* Header */
+.header { text-align:center; margin-bottom:32px; }
+.header-icon { font-size:36px; animation:float 3s ease-in-out infinite; }
+.header h1 { font-size:22px; font-weight:400; letter-spacing:.2em; margin:10px 0 6px; color:#f8c0e0; }
+.header-sub { font-size:10px; letter-spacing:.5em; color:#a06080; }
+.header-desc { font-size:12px; color:#c080a0; margin-top:10px; line-height:1.8; }
+
+/* Form */
+.form-wrap { width:100%; max-width:380px; }
+.step-label { font-size:10px; letter-spacing:.35em; color:#c060a0; margin-bottom:8px; text-transform:uppercase; }
+.section-title { font-size:14px; color:#f0c0d8; margin-bottom:16px; letter-spacing:.1em; }
+
+/* Date input */
+.input-row { display:flex; gap:8px; margin-bottom:8px; align-items:center; }
+.input-row span { color:#906070; flex-shrink:0; font-size:13px; }
+input[type=number] {
+background:rgba(255,180,220,.06); border:1px solid rgba(255,180,220,.25);
+border-radius:10px; color:#f0d0e8; font-size:16px; font-family:inherit;
+text-align:center; outline:none; padding:13px 6px; transition:border-color .2s;
+-moz-appearance:textfield;
+}
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; }
+input[type=number]:focus { border-color:rgba(255,150,200,.6); background:rgba(255,180,220,.1); }
+#year-input { flex:2; } #month-input,#day-input { flex:1; }
+
+/* Select buttons */
+.select-group { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+.sel-btn {
+padding:10px 16px; border-radius:24px; font-size:13px; font-family:inherit;
+border:1px solid rgba(255,150,200,.3); background:rgba(255,180,220,.05);
+color:#d090b8; cursor:pointer; transition:all .2s; letter-spacing:.05em;
+}
+.sel-btn:hover { border-color:rgba(255,150,200,.6); background:rgba(255,180,220,.12); }
+.sel-btn.active {
+background:linear-gradient(135deg,#8b1a5a,#c4326a);
+border-color:transparent; color:#fff;
+box-shadow:0 4px 15px rgba(196,50,106,.4);
+}
+
+.divider { height:1px; background:rgba(255,150,200,.12); margin:20px 0; }
+
+/* Main button */
+.btn-main {
+width:100%; padding:16px;
+background:linear-gradient(135deg,#8b1a5a,#c4326a,#8b1a5a);
+color:#fff; border:none; border-radius:50px; font-size:15px;
+font-family:inherit; font-weight:bold; letter-spacing:.2em; cursor:pointer;
+box-shadow:0 4px 20px rgba(196,50,106,.5); transition:transform .2s,box-shadow .2s;
+margin-top:8px;
+}
+.btn-main:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(196,50,106,.6); }
+.btn-main:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+
+/* Cards */
+.result-wrap { width:100%; max-width:420px; }
+.result-header { text-align:center; margin-bottom:24px; }
+.result-title { font-size:13px; color:#906070; margin-bottom:12px; letter-spacing:.15em; }
+.sign-row { display:flex; justify-content:center; gap:28px; }
+.sign-item { text-align:center; }
+.sign-emoji { font-size:26px; }
+.sign-name { font-size:11px; color:#d090b8; margin-top:4px; }
+.sign-div { width:1px; background:rgba(255,150,200,.2); }
+
+.card {
+background:rgba(255,255,255,.03);
+border:1px solid rgba(255,150,200,.18);
+border-radius:18px; padding:20px; margin-bottom:12px;
+}
+.card-special { border-color:rgba(255,150,200,.35); background:rgba(255,100,180,.05); }
+.lbl { font-size:9px; letter-spacing:.4em; color:#c060a0; margin-bottom:10px; text-transform:uppercase; }
+
+/* Score bar */
+.score-wrap { margin-bottom:16px; }
+.score-label { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.score-name { font-size:12px; color:#d090b8; }
+.score-num { font-size:13px; color:#f8c0e0; font-weight:bold; }
+.score-bar-bg { height:6px; background:rgba(255,150,200,.15); border-radius:3px; overflow:hidden; }
+.score-bar { height:100%; border-radius:3px; background:linear-gradient(90deg,#8b1a5a,#f06090); transition:width 1s ease; }
+
+.fortune-text { font-size:13px; color:#d4a0c0; line-height:2; margin-bottom:14px; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.sub-card { background:rgba(255,150,200,.05); border-radius:12px; padding:12px; }
+.sub-lbl { font-size:9px; letter-spacing:.3em; color:#906070; margin-bottom:5px; }
+.sub-val { font-size:12px; color:#d090b8; line-height:1.7; }
+.sub-val.pink { color:#f0a0c8; }
+
+.timing-box { background:rgba(255,100,150,.08); border:1px solid rgba(255,150,200,.2); border-radius:12px; padding:14px; margin-top:10px; text-align:center; }
+.timing-main { font-size:20px; color:#f8c0e0; font-weight:bold; letter-spacing:.1em; margin-bottom:4px; }
+.timing-sub { font-size:11px; color:#a06080; }
+
+.lucky-row { display:flex; justify-content:space-around; text-align:center; }
+.lucky-lbl { font-size:9px; letter-spacing:.3em; color:#906070; margin-bottom:6px; }
+.lucky-val { font-size:13px; color:#f0d0e8; }
+.lucky-val.big { font-size:20px; color:#f8c0e0; font-weight:bold; }
+
+.advice-text { font-size:14px; color:#f8c0e0; line-height:2.1; font-style:italic; text-align:center; }
+
+.action-list { list-style:none; }
+.action-list li { font-size:13px; color:#d090b8; line-height:1.8; padding:8px 0; border-bottom:1px solid rgba(255,150,200,.1); display:flex; gap:8px; }
+.action-list li:last-child { border-bottom:none; }
+.action-list li::before { content:“✦”; color:#c060a0; flex-shrink:0; }
+
+.btn-reset {
+display:block; margin:12px auto 0;
+background:transparent; border:1px solid rgba(255,150,200,.25); color:#906070;
+padding:10px 28px; border-radius:24px; cursor:pointer; font-size:13px;
+letter-spacing:.2em; font-family:inherit; transition:all .2s;
+}
+.btn-reset:hover { border-color:rgba(255,150,200,.5); color:#d090b8; }
+.hidden { display:none; }
+</style>
+
+</head>
+<body>
+
+<!-- Header -->
+
+<div class="header fade">
+  <div class="header-icon">💍</div>
+  <h1>婚活運勢占い</h1>
+  <div class="header-sub">MARRIAGE FORTUNE</div>
+  <div class="header-desc">あなたの婚活運と出会いの時期を鑑定します</div>
+</div>
+
+<!-- Form -->
+
+<div class="form-wrap fade" id="form-section" style="animation-delay:.15s">
+
+  <!-- Step 1: Birthday -->
+
+  <div class="step-label">Step 1</div>
+  <div class="section-title">生年月日を教えてください</div>
+  <div class="input-row">
+    <input type="number" id="year-input" placeholder="西暦" min="1985" max="1999">
+    <span>年</span>
+    <input type="number" id="month-input" placeholder="月" min="1" max="12">
+    <span>月</span>
+    <input type="number" id="day-input" placeholder="日" min="1" max="31">
+    <span>日</span>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 2: Status -->
+
+  <div class="step-label">Step 2</div>
+  <div class="section-title">現在の婚活状況は？</div>
+  <div class="select-group" id="status-group">
+    <button class="sel-btn" onclick="select('status', this, '婚活アプリ中心')">アプリ婚活中</button>
+    <button class="sel-btn" onclick="select('status', this, '友人紹介待ち')">友人紹介待ち</button>
+    <button class="sel-btn" onclick="select('status', this, '婚活パーティー参加中')">パーティー参加</button>
+    <button class="sel-btn" onclick="select('status', this, '気になる人がいる')">気になる人あり</button>
+    <button class="sel-btn" onclick="select('status', this, 'まだ始めていない')">まだ始めてない</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 3: Concern -->
+
+  <div class="step-label">Step 3</div>
+  <div class="section-title">一番の悩みは？</div>
+  <div class="select-group" id="concern-group">
+    <button class="sel-btn" onclick="select('concern', this, '出会いの数が少ない')">出会いが少ない</button>
+    <button class="sel-btn" onclick="select('concern', this, '交際に発展しない')">交際に進まない</button>
+    <button class="sel-btn" onclick="select('concern', this, '自分に自信がない')">自信がない</button>
+    <button class="sel-btn" onclick="select('concern', this, '理想の相手が見つからない')">理想が高すぎる？</button>
+    <button class="sel-btn" onclick="select('concern', this, '年齢への焦り')">年齢への焦り</button>
+  </div>
+
+<button class="btn-main" id="btn-go" onclick="analyze()" disabled>💍 鑑定する</button>
+
+</div>
+
+<!-- Result -->
+
+<div class="result-wrap hidden" id="result-section"></div>
+
+<script>
+const selected = { status: null, concern: null };
+
+function select(type, el, val) {
+  document.querySelectorAll(`#${type}-group .sel-btn`).forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selected[type] = val;
+  checkReady();
+}
+
+function checkReady() {
+  const year = document.getElementById('year-input').value;
+  const month = document.getElementById('month-input').value;
+  const day = document.getElementById('day-input').value;
+  document.getElementById('btn-go').disabled = !(year && month && day && selected.status && selected.concern);
+}
+
+['year-input','month-input','day-input'].forEach(id => {
+  document.getElementById(id).addEventListener('input', checkReady);
+});
+
+const ZODIAC = [
+  {name:"山羊座",emoji:"♑",m:12,d:22},{name:"水瓶座",emoji:"♒",m:1,d:20},
+  {name:"魚座",emoji:"♓",m:2,d:19},{name:"牡羊座",emoji:"♈",m:3,d:21},
+  {name:"牡牛座",emoji:"♉",m:4,d:20},{name:"双子座",emoji:"♊",m:5,d:21},
+  {name:"蟹座",emoji:"♋",m:6,d:21},{name:"獅子座",emoji:"♌",m:7,d:23},
+  {name:"乙女座",emoji:"♍",m:8,d:23},{name:"天秤座",emoji:"♎",m:9,d:23},
+  {name:"蠍座",emoji:"♏",m:10,d:23},{name:"射手座",emoji:"♐",m:11,d:22},
+];
+const ANIMALS = [
+  {name:"鼠",emoji:"🐭"},{name:"牛",emoji:"🐮"},{name:"虎",emoji:"🐯"},
+  {name:"兎",emoji:"🐰"},{name:"龍",emoji:"🐲"},{name:"蛇",emoji:"🐍"},
+  {name:"馬",emoji:"🐴"},{name:"羊",emoji:"🐑"},{name:"猿",emoji:"🐒"},
+  {name:"鶏",emoji:"🐓"},{name:"犬",emoji:"🐕"},{name:"猪",emoji:"🐗"},
+];
+
+function getZodiac(m,d) {
+  for (let i=ZODIAC.length-1;i>=0;i--) {
+    if (m>ZODIAC[i].m||(m===ZODIAC[i].m&&d>=ZODIAC[i].d)) return ZODIAC[i];
+  }
+  return ZODIAC[0];
+}
+function getAnimal(y) { return ANIMALS[((y-4)%12+12)%12]; }
+function idx(y,m,d,off,len) { return ((y*31+m*7+d+off)%len+len)%len; }
+
+const MARRIAGE_FORTUNE = [
+  {score:88,text:"婚活運が非常に高まっています。積極的に動けば動くほど縁が引き寄せられる時期。直感を信じて行動しましょう。"},
+  {score:75,text:"着実に縁が近づいています。焦らず自分らしさを大切にすることで、本当に合う相手と出会えます。"},
+  {score:82,text:"コミュニケーション力が冴える時期。明るく自然体でいることが最大の魅力になります。"},
+  {score:70,text:"内面の充実が外の世界に反映される時。自分磨きへの投資が、素敵な出会いを呼び込みます。"},
+  {score:91,text:"運命的な出会いの予感。日常のちょっとした場所に素敵な縁が隠れています。アンテナを張って。"},
+  {score:78,text:"誠実さと丁寧さが縁を育む時期。焦りは禁物。一つ一つの出会いを大切にしていきましょう。"},
+  {score:85,text:"バランスよく自分を表現できる時期。笑顔と穏やかさが相手の心を惹きつけます。"},
+  {score:73,text:"変化と再生の時。過去のパターンを手放すことで、新しい縁への扉が開きます。"},
+  {score:80,text:"行動することで運気が上がります。新しい場所・コミュニティへの参加が吉。"},
+  {score:86,text:"努力が実を結ぶ時期。これまでの婚活経験が今、大きな財産になっています。"},
+  {score:77,text:"独自の魅力が光る時期。ありのままの自分を見せることで心の通じる相手と出会えます。"},
+  {score:83,text:"感受性豊かな時期。直感的に「この人」と思えた出会いを大切にして。"},
+];
+
+const TIMING = [
+  "今年の秋〜冬","来春（3〜5月）","今年中","半年以内","来年上半期",
+  "今年の夏","3ヶ月以内","来年中","今秋がピーク","半年〜1年以内",
+  "今年の年末","来春〜夏",
+];
+
+const MEET_PLACE = [
+  "職場や仕事関係の集まり","趣味のサークルやイベント","友人・知人の紹介",
+  "マッチングアプリ","地域のコミュニティ活動","習い事や勉強会",
+  "旅行先や非日常の場所","飲食店や偶然の出会い","SNSや共通の興味から",
+];
+
+const PARTNER_TYPE = [
+  "穏やかで包容力のある年上タイプ","誠実でまじめな同世代タイプ",
+  "明るくユーモアあふれるタイプ","知的で話が合うタイプ",
+  "安定感があり頼れるタイプ","感受性豊かな芸術的なタイプ",
+];
+
+const ADVICE = [
+  "あなたの笑顔が最大の武器です。自信を持って輝いてください。",
+  "完璧を求めすぎず、相手の良いところを見つける目を育てましょう。",
+  "自分を愛することが、相手に愛される第一歩。自分磨きを続けて。",
+  "焦りは禁物。あなたにふさわしい縁は必ず近づいています。",
+  "直感を信じて。「いいな」と思ったらまず一歩踏み出す勇気を。",
+  "出会いの場を広げることで、運命の人との距離が縮まります。",
+];
+
+const ACTIONS_BY_CONCERN = {
+  '出会いの数が少ない': [
+    "月に2回以上、新しい場所・イベントに参加する",
+    "マッチングアプリを1〜2つ並行して活用する",
+    "友人に「良い人がいたら紹介して」と積極的に伝える",
+  ],
+  '交際に発展しない': [
+    "2〜3回会ったら自分から気持ちを確かめる会話をする",
+    "デートの場所選びに少しこだわりを加える",
+    "LINEの返信に温かみのある一言を添える",
+  ],
+  '自信がない': [
+    "毎朝、自分の好きなところを1つ言葉にする習慣をつける",
+    "得意なことや趣味を婚活の自己紹介に活かす",
+    "信頼できる友人に自分の魅力を聞いてみる",
+  ],
+  '理想の相手が見つからない': [
+    "「絶対条件」と「あれば嬉しい条件」を書き出して整理する",
+    "1つだけ条件を緩めて、新しいタイプに会ってみる",
+    "相手に求めることと同じものを自分も持っているか振り返る",
+  ],
+  '年齢への焦り': [
+    "焦りを「行動するエネルギー」に変えて月1回新しい出会いの場へ",
+    "30代の魅力（落ち着き・自立心）を自信に変える",
+    "長期的な視点で「1年後の自分」をイメージして行動する",
+  ],
+};
+
+const LUCKY_COLORS = ["ローズピンク","コーラルレッド","ラベンダー","パールホワイト","シャンパンゴールド","モーヴピンク"];
+const LUCKY_ITEMS  = ["ローズクォーツ","シルクのスカーフ","花柄のハンカチ","パールのアクセサリー","香水","手鏡"];
+
+function analyze() {
+  const year  = parseInt(document.getElementById('year-input').value);
+  const month = parseInt(document.getElementById('month-input').value);
+  const day   = parseInt(document.getElementById('day-input').value);
+  if (!year||!month||!day) return;
+
+  const zodiac = getZodiac(month, day);
+  const animal = getAnimal(year);
+  const mf     = MARRIAGE_FORTUNE[idx(year,month,day,0,MARRIAGE_FORTUNE.length)];
+  const timing = TIMING[idx(year,month,day,3,TIMING.length)];
+  const meet   = MEET_PLACE[idx(year,month,day,7,MEET_PLACE.length)];
+  const partner= PARTNER_TYPE[idx(year,month,day,11,PARTNER_TYPE.length)];
+  const advice = ADVICE[idx(year,month,day,5,ADVICE.length)];
+  const lcolor = LUCKY_COLORS[idx(year,month,day,13,LUCKY_COLORS.length)];
+  const litem  = LUCKY_ITEMS[idx(year,month,day,17,LUCKY_ITEMS.length)];
+  const lnum   = ((year+month*3+day*7)%9)+1;
+  const actions= ACTIONS_BY_CONCERN[selected.concern] || ACTIONS_BY_CONCERN['出会いの数が少ない'];
+  const scoreW = Math.min(100, mf.score + (selected.status==='気になる人がいる' ? 5 : 0));
+
+  document.getElementById('form-section').classList.add('hidden');
+  const sec = document.getElementById('result-section');
+
+  sec.innerHTML = `
+    <div class="result-header fade">
+      <div class="result-title">${year}年${month}月${day}日生まれ・${zodiac.name}</div>
+      <div class="sign-row">
+        <div class="sign-item"><div class="sign-emoji">${zodiac.emoji}</div><div class="sign-name">${zodiac.name}</div></div>
+        <div class="sign-div"></div>
+        <div class="sign-item"><div class="sign-emoji">💍</div><div class="sign-name">婚活鑑定</div></div>
+        <div class="sign-div"></div>
+        <div class="sign-item"><div class="sign-emoji">${animal.emoji}</div><div class="sign-name">${animal.name}年</div></div>
+      </div>
+    </div>
+
+    <!-- 婚活運スコア -->
+    <div class="card card-special fade" style="animation-delay:.1s">
+      <div class="lbl">婚活総合運</div>
+      <div class="score-wrap">
+        <div class="score-label">
+          <span class="score-name">婚活運</span>
+          <span class="score-num">${scoreW}点</span>
+        </div>
+        <div class="score-bar-bg"><div class="score-bar" style="width:${scoreW}%"></div></div>
+      </div>
+      <div class="fortune-text">${mf.text}</div>
+      <div class="timing-box">
+        <div class="timing-main">🌸 ${timing}</div>
+        <div class="timing-sub">出会い・進展のピーク時期</div>
+      </div>
+    </div>
+
+    <!-- 出会いと相手 -->
+    <div class="card fade" style="animation-delay:.2s">
+      <div class="lbl">出会いの鑑定</div>
+      <div class="grid2">
+        <div class="sub-card">
+          <div class="sub-lbl">出会いの場</div>
+          <div class="sub-val pink">${meet}</div>
+        </div>
+        <div class="sub-card">
+          <div class="sub-lbl">相性のいい相手</div>
+          <div class="sub-val pink">${partner}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 現状アドバイス -->
+    <div class="card fade" style="animation-delay:.25s">
+      <div class="lbl">「${selected.concern}」への処方箋</div>
+      <ul class="action-list">
+        ${actions.map(a => `<li>${a}</li>`).join('')}
+      </ul>
+    </div>
+
+    <!-- Lucky -->
+    <div class="card fade" style="animation-delay:.3s">
+      <div class="lbl">婚活Lucky</div>
+      <div class="lucky-row">
+        <div>
+          <div class="lucky-lbl">COLOR</div>
+          <div class="lucky-val">🎨 ${lcolor}</div>
+        </div>
+        <div>
+          <div class="lucky-lbl">NUMBER</div>
+          <div class="lucky-val big">${lnum}</div>
+        </div>
+        <div>
+          <div class="lucky-lbl">ITEM</div>
+          <div class="lucky-val">💎 ${litem}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- メッセージ -->
+    <div class="card fade" style="animation-delay:.35s">
+      <div class="lbl">あなたへのメッセージ</div>
+      <div class="advice-text">「${advice}」</div>
+    </div>
+
+    <button class="btn-reset" onclick="reset()">💍 もう一度鑑定する</button>
+  `;
+  sec.classList.remove('hidden');
+}
+
+function reset() {
+  document.getElementById('result-section').classList.add('hidden');
+  document.getElementById('result-section').innerHTML = '';
+  document.getElementById('form-section').classList.remove('hidden');
+  document.querySelectorAll('.sel-btn').forEach(b => b.classList.remove('active'));
+  selected.status = null; selected.concern = null;
+  ['year-input','month-input','day-input'].forEach(id => document.getElementById(id).value='');
+  document.getElementById('btn-go').disabled = true;
+}
+</script>
+
+</body>
+</html>
